@@ -1,0 +1,979 @@
+<style>
+  :root{
+    --plane:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --base:#c3c2b7; --hair:rgba(11,11,11,0.10);
+    --s-atd:#2a78d6; --s-ema:#1baf7a; --s-bh:#eb6834;
+    --bad:#c0392b; --bad-bg:rgba(192,57,43,0.10);
+    --mono:ui-monospace,"Cascadia Code","SF Mono",Menlo,Consolas,monospace;
+    --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --plane:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --base:#383835; --hair:rgba(255,255,255,0.10);
+      --s-atd:#3987e5; --s-ema:#199e70; --s-bh:#d95926;
+      --bad:#e57368; --bad-bg:rgba(229,115,104,0.13);
+    }
+  }
+  :root[data-theme="light"]{
+    --plane:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --base:#c3c2b7; --hair:rgba(11,11,11,0.10);
+    --s-atd:#2a78d6; --s-ema:#1baf7a; --s-bh:#eb6834; --bad:#c0392b; --bad-bg:rgba(192,57,43,0.10);
+  }
+  :root[data-theme="dark"]{
+    --plane:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --base:#383835; --hair:rgba(255,255,255,0.10);
+    --s-atd:#3987e5; --s-ema:#199e70; --s-bh:#d95926; --bad:#e57368; --bad-bg:rgba(229,115,104,0.13);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--plane);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+  .wrap{max-width:1120px;margin:0 auto;padding:clamp(20px,4vw,44px)}
+
+  .eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--muted);margin:0 0 10px}
+  h1{font-size:clamp(1.5rem,3.4vw,2.15rem);line-height:1.12;margin:0 0 14px;font-weight:650;
+    letter-spacing:-.01em;text-wrap:balance;max-width:22ch}
+  .lede{font-size:1.02rem;color:var(--ink2);max-width:64ch;margin:0 0 18px}
+  .lede b{color:var(--ink);font-weight:600}
+  .verdict{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.74rem;
+    font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--bad);
+    background:var(--bad-bg);border:1px solid color-mix(in srgb,var(--bad) 40%,transparent);
+    padding:5px 11px;border-radius:999px;vertical-align:middle}
+  .meta{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--mono);font-size:.74rem;
+    color:var(--muted);border-top:1px solid var(--hair);padding-top:14px;margin-top:18px}
+  .meta b{color:var(--ink2);font-weight:600}
+
+  .controls{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:26px 0 18px}
+  .seg{display:inline-flex;background:var(--surface);border:1px solid var(--hair);border-radius:10px;
+    padding:3px;gap:2px}
+  .seg button{font-family:var(--mono);font-size:.76rem;color:var(--ink2);background:none;border:0;
+    padding:7px 13px;border-radius:7px;cursor:pointer;letter-spacing:.02em}
+  .seg button[aria-pressed="true"]{background:var(--s-atd);color:#fff}
+  .seg button:focus-visible{outline:2px solid var(--s-atd);outline-offset:2px}
+  .hint{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:.74rem;color:var(--ink2)}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .sw.atd{background:var(--s-atd)} .sw.ema{background:var(--s-ema)} .sw.bh{background:var(--s-bh)}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+  @media (max-width:760px){.grid{grid-template-columns:1fr}}
+  figure{margin:0;background:var(--surface);border:1px solid var(--hair);border-radius:14px;
+    padding:16px 16px 12px;display:flex;flex-direction:column;gap:10px}
+  .p-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .p-title{font-size:1rem;font-weight:640;letter-spacing:-.005em}
+  .p-chip{font-family:var(--mono);font-size:.72rem;color:var(--bad);white-space:nowrap}
+  .p-chip.warnband{color:var(--ink2)}
+  .stats{display:flex;gap:14px;font-family:var(--mono);font-size:.72rem;color:var(--muted);flex-wrap:wrap}
+  .stats b{color:var(--ink);font-weight:600}
+  .stats .k{display:inline-flex;gap:5px;align-items:center}
+  .stats .dot{width:8px;height:8px;border-radius:2px}
+  .dot.atd{background:var(--s-atd)} .dot.ema{background:var(--s-ema)} .dot.bh{background:var(--s-bh)}
+  .ab-section{background:var(--surface);border:1px solid var(--hair);border-radius:14px;
+    padding:18px 18px 14px;margin-top:22px;display:flex;flex-direction:column;gap:10px}
+  .ab-section h2{font-size:1.12rem;font-weight:640;margin:0;letter-spacing:-.01em}
+  .ab-note{font-size:.92rem;color:var(--ink2);margin:0;max-width:74ch}
+  .ab-note b{color:var(--ink)}
+  .pt{stroke:var(--surface);stroke-width:1.5}
+  .pt.atd{fill:var(--s-atd)} .pt.ema{fill:var(--s-ema)} .pt.bh{fill:var(--s-bh)}
+  .hitc{fill:transparent;cursor:pointer}
+  .axttl{fill:var(--muted);font-family:var(--mono);font-size:10px;text-anchor:middle}
+  .chart svg{width:100%;height:auto;display:block}
+  .gridline{stroke:var(--grid);stroke-width:1}
+  .zeroline{stroke:var(--base);stroke-width:1.5}
+  .axislbl{fill:var(--muted);font-family:var(--mono);font-size:9px}
+  .axislbl.y{text-anchor:end} .axislbl.x{text-anchor:middle}
+  .bar{rx:2}
+  .bar.atd{fill:var(--s-atd)} .bar.ema{fill:var(--s-ema)} .bar.bh{fill:var(--s-bh)}
+  .hit{fill:transparent;cursor:pointer}
+  .hit:hover{fill:var(--ink);fill-opacity:.05}
+
+  .tbtn{align-self:flex-start;font-family:var(--mono);font-size:.7rem;color:var(--ink2);background:none;
+    border:1px solid var(--hair);border-radius:7px;padding:5px 10px;cursor:pointer;letter-spacing:.03em}
+  .tbtn:focus-visible{outline:2px solid var(--s-atd);outline-offset:2px}
+  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:.7rem;margin-top:2px}
+  th,td{text-align:right;padding:3px 6px;border-bottom:1px solid var(--hair);white-space:nowrap}
+  th:first-child,td:first-child{text-align:left;color:var(--ink2)}
+  thead th{color:var(--muted);font-weight:600}
+  td.atd{color:var(--s-atd)} td.ema{color:var(--s-ema)} td.bh{color:var(--s-bh)}
+  .tbl-wrap{overflow-x:auto}
+  [hidden]{display:none}
+
+  .tip{position:fixed;pointer-events:none;z-index:20;background:var(--surface);color:var(--ink);
+    border:1px solid var(--hair);border-radius:9px;padding:9px 11px;font-family:var(--mono);
+    font-size:.72rem;box-shadow:0 6px 20px rgba(0,0,0,.18);opacity:0;transition:opacity .1s;max-width:230px}
+  .tip .ty{color:var(--muted);margin-bottom:5px}
+  .tip .tr{display:flex;justify-content:space-between;gap:14px}
+  .tip .tr b{font-weight:600}
+
+  footer{margin-top:30px;border-top:1px solid var(--hair);padding-top:16px;color:var(--ink2);
+    font-size:.86rem;max-width:70ch}
+  footer .fnote{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:8px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Independent backtest · feasibility audit</p>
+  <h1>Agentic Trading Desk: per-year returns vs. its controls</h1>
+  <p class="lede"><span class="verdict">● No edge</span>&nbsp; Mechanized faithfully and scored per calendar
+    year, the ATD cascade sits <b>below a plain EMA-200 in/out filter and buy-and-hold in every universe</b>.
+    It only out-returns them in down years (2018, 2022) — buying that downside protection by forfeiting most of
+    the upside every rising year.</p>
+  <div class="meta">
+    <span><b>Span</b> 2017-02-27 → 2026-06-18 (2017 &amp; 2026 partial)</span>
+    <span><b>Cost</b> 3 bps/side net</span>
+    <span><b>Curves</b> densified daily MTM</span>
+    <span><b>Basis</b> pre-registered · equal-weight book</span>
+  </div>
+
+  <div class="controls">
+    <div class="seg" role="group" aria-label="Metric">
+      <button data-metric="ret" aria-pressed="true">Return&nbsp;%</button>
+      <button data-metric="maxdd" aria-pressed="false">Max drawdown&nbsp;%</button>
+      <button data-metric="sharpe" aria-pressed="false">Sharpe</button>
+    </div>
+    <span class="hint" id="hint">Calendar-year total return. Higher is better.</span>
+    <div class="legend" style="margin-left:auto">
+      <span><i class="sw atd"></i>ATD (system under test)</span>
+      <span><i class="sw ema"></i>EMA-200 control</span>
+      <span><i class="sw bh"></i>Buy &amp; hold</span>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="ab-section">
+    <h2>Alpha vs. beta — whole period</h2>
+    <p class="ab-note">Factor-neutral annualized alpha (Fama-French 5-factor, Dimson-lagged market term,
+      Newey-West standard errors) plotted against market beta — one point per universe, per book. Unlike the
+      per-year bars above, these are single whole-period regressions. <b>ATD is the only book below the
+      zero-alpha line</b>: negative alpha at moderate beta. The EMA-200 control sits just above zero; buy-and-hold
+      carries the market (beta ≈ 1) with mildly positive alpha.</p>
+    <div class="chart" id="ab-chart"></div>
+    <button class="tbtn" data-t="ab" aria-expanded="false">Show table</button>
+    <div class="tbl" id="t-ab" hidden></div>
+  </div>
+
+  <footer>
+    Each panel is one universe. Bars are calendar-year values for the ATD book, the EMA-200 in/out control (long
+    when price &gt; its trailing 200-day EMA, else flat), and equal-weight buy-and-hold — all through the same
+    engine, same costs, same dividends. The control is the yardstick: if the cascade's flags, TRIX and pillars
+    added timing skill, ATD would beat it. It does not, in any universe or cost tier.
+    <div class="fnote">Pre-registered before running (decision rule fixed in advance). Primary metric = paired
+      block-bootstrap ΔSharpe of ATD − EMA-200 control at 3 bps; negative in all 4 universes (p_gt0 ≤ 0.20).
+      Method and fixes are summarized in the accompanying write-up.</div>
+  </footer>
+</div>
+
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+const DATA = {
+ "span": [
+  "2017-02-27",
+  "2026-06-18"
+ ],
+ "universes": [
+  {
+   "key": "faith11",
+   "label": "Faith-11 (author\u2019s holdings)",
+   "years": [
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024",
+    "2025",
+    "2026"
+   ],
+   "series": {
+    "primary": {
+     "label": "ATD",
+     "ret": [
+      8.7,
+      -2.2,
+      8.1,
+      19.6,
+      7.1,
+      -18.9,
+      2.6,
+      14.9,
+      0.2,
+      -2.7
+     ],
+     "maxdd": [
+      3.2,
+      8.7,
+      5.3,
+      17.5,
+      12.3,
+      19.3,
+      12.1,
+      4.9,
+      17.1,
+      10.2
+     ],
+     "sharpe": [
+      1.83,
+      -0.19,
+      1.36,
+      1.39,
+      0.57,
+      -2.42,
+      0.29,
+      1.28,
+      0.09,
+      -0.48
+     ]
+    },
+    "B2_ema200": {
+     "label": "EMA-200",
+     "ret": [
+      13.9,
+      -8.1,
+      3.5,
+      67.5,
+      25.8,
+      -25.0,
+      10.7,
+      10.4,
+      10.1,
+      -0.5
+     ],
+     "maxdd": [
+      3.4,
+      13.0,
+      7.8,
+      21.7,
+      17.4,
+      25.0,
+      19.0,
+      16.1,
+      18.7,
+      12.0
+     ],
+     "sharpe": [
+      1.86,
+      -0.73,
+      0.52,
+      2.24,
+      1.04,
+      -1.99,
+      0.7,
+      0.6,
+      0.57,
+      0.01
+     ]
+    },
+    "B1_buyhold": {
+     "label": "Buy & hold",
+     "ret": [
+      15.0,
+      -7.2,
+      24.0,
+      121.9,
+      26.2,
+      -52.3,
+      67.1,
+      38.8,
+      20.1,
+      0.3
+     ],
+     "maxdd": [
+      3.4,
+      18.0,
+      9.2,
+      37.3,
+      21.9,
+      54.6,
+      22.9,
+      18.8,
+      34.7,
+      18.0
+     ],
+     "sharpe": [
+      1.97,
+      -0.36,
+      1.66,
+      2.16,
+      0.89,
+      -1.45,
+      1.84,
+      1.18,
+      0.67,
+      0.16
+     ]
+    }
+   },
+   "summary": {
+    "primary": {
+     "sharpe": 0.3527,
+     "cagr": 3.3,
+     "maxdd": 28.9
+    },
+    "B2_ema200": {
+     "sharpe": 0.6133,
+     "cagr": 9.7,
+     "maxdd": 29.8
+    },
+    "B1_buyhold": {
+     "sharpe": 0.7021,
+     "cagr": 18.6,
+     "maxdd": 56.7
+    }
+   },
+   "delta_vs_ctrl": {
+    "delta": -0.2607,
+    "lo": -0.758,
+    "hi": 0.2208,
+    "p_gt0": 0.138
+   }
+  },
+  {
+   "key": "adv315",
+   "label": "ADV-315 (liquid large/mid)",
+   "years": [
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024",
+    "2025",
+    "2026"
+   ],
+   "series": {
+    "primary": {
+     "label": "ATD",
+     "ret": [
+      9.4,
+      0.7,
+      15.0,
+      5.3,
+      18.9,
+      -12.0,
+      7.2,
+      7.1,
+      -0.2,
+      3.9
+     ],
+     "maxdd": [
+      1.9,
+      8.5,
+      3.5,
+      17.3,
+      3.5,
+      12.7,
+      7.3,
+      4.2,
+      10.3,
+      4.0
+     ],
+     "sharpe": [
+      2.57,
+      0.12,
+      2.2,
+      0.47,
+      1.95,
+      -1.67,
+      1.1,
+      1.01,
+      0.01,
+      1.33
+     ]
+    },
+    "B2_ema200": {
+     "label": "EMA-200",
+     "ret": [
+      15.7,
+      -2.0,
+      19.6,
+      25.3,
+      22.2,
+      -12.4,
+      8.4,
+      12.0,
+      2.5,
+      9.6
+     ],
+     "maxdd": [
+      2.8,
+      11.6,
+      4.6,
+      19.5,
+      9.2,
+      13.6,
+      8.7,
+      7.0,
+      11.2,
+      7.2
+     ],
+     "sharpe": [
+      2.55,
+      -0.11,
+      1.99,
+      1.33,
+      1.24,
+      -1.3,
+      0.97,
+      1.07,
+      0.33,
+      1.55
+     ]
+    },
+    "B1_buyhold": {
+     "label": "Buy & hold",
+     "ret": [
+      18.4,
+      -2.7,
+      37.9,
+      47.6,
+      27.2,
+      -16.2,
+      14.3,
+      14.1,
+      10.5,
+      16.8
+     ],
+     "maxdd": [
+      2.9,
+      20.1,
+      6.0,
+      37.0,
+      10.9,
+      27.2,
+      17.8,
+      9.0,
+      19.9,
+      9.2
+     ],
+     "sharpe": [
+      2.62,
+      -0.06,
+      2.41,
+      1.24,
+      1.31,
+      -0.41,
+      0.86,
+      0.97,
+      0.62,
+      2.01
+     ]
+    }
+   },
+   "summary": {
+    "primary": {
+     "sharpe": 0.7178,
+     "cagr": 5.6,
+     "maxdd": 17.3
+    },
+    "B2_ema200": {
+     "sharpe": 0.859,
+     "cagr": 10.2,
+     "maxdd": 20.3
+    },
+    "B1_buyhold": {
+     "sharpe": 0.8192,
+     "cagr": 16.6,
+     "maxdd": 37.0
+    }
+   },
+   "delta_vs_ctrl": {
+    "delta": -0.1412,
+    "lo": -0.4577,
+    "hi": 0.2077,
+    "p_gt0": 0.198
+   }
+  },
+  {
+   "key": "mid502",
+   "label": "Mid-502 (delisting-inclusive)",
+   "years": [
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024",
+    "2025",
+    "2026"
+   ],
+   "series": {
+    "primary": {
+     "label": "ATD",
+     "ret": [
+      6.5,
+      -1.3,
+      8.2,
+      4.5,
+      14.1,
+      -8.0,
+      7.1,
+      5.2,
+      -1.3,
+      5.4
+     ],
+     "maxdd": [
+      2.8,
+      7.6,
+      3.1,
+      15.0,
+      3.7,
+      8.4,
+      4.5,
+      4.3,
+      8.0,
+      2.6
+     ],
+     "sharpe": [
+      1.83,
+      -0.17,
+      1.6,
+      0.52,
+      1.65,
+      -1.27,
+      1.3,
+      0.82,
+      -0.2,
+      2.16
+     ]
+    },
+    "B2_ema200": {
+     "label": "EMA-200",
+     "ret": [
+      9.3,
+      -1.0,
+      13.7,
+      13.0,
+      20.5,
+      -9.3,
+      8.2,
+      9.7,
+      1.2,
+      12.7
+     ],
+     "maxdd": [
+      3.4,
+      10.5,
+      3.2,
+      11.8,
+      8.2,
+      10.1,
+      5.9,
+      6.9,
+      10.1,
+      5.1
+     ],
+     "sharpe": [
+      1.71,
+      -0.07,
+      1.99,
+      1.1,
+      1.33,
+      -1.15,
+      1.04,
+      0.93,
+      0.18,
+      2.05
+     ]
+    },
+    "B1_buyhold": {
+     "label": "Buy & hold",
+     "ret": [
+      16.0,
+      -6.4,
+      26.2,
+      31.5,
+      26.7,
+      -13.9,
+      20.5,
+      10.7,
+      12.2,
+      16.4
+     ],
+     "maxdd": [
+      5.0,
+      21.5,
+      6.6,
+      35.2,
+      9.3,
+      21.9,
+      10.1,
+      8.9,
+      18.9,
+      10.1
+     ],
+     "sharpe": [
+      2.0,
+      -0.36,
+      1.88,
+      1.02,
+      1.48,
+      -0.51,
+      1.43,
+      0.74,
+      0.71,
+      1.77
+     ]
+    }
+   },
+   "summary": {
+    "primary": {
+     "sharpe": 0.6618,
+     "cagr": 4.2,
+     "maxdd": 15.0
+    },
+    "B2_ema200": {
+     "sharpe": 0.8324,
+     "cagr": 8.1,
+     "maxdd": 15.0
+    },
+    "B1_buyhold": {
+     "sharpe": 0.8036,
+     "cagr": 14.3,
+     "maxdd": 35.2
+    }
+   },
+   "delta_vs_ctrl": {
+    "delta": -0.1706,
+    "lo": -0.5053,
+    "hi": 0.1447,
+    "p_gt0": 0.164
+   }
+  },
+  {
+   "key": "midcap817",
+   "label": "Midcap-817 (broad)",
+   "years": [
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024",
+    "2025",
+    "2026"
+   ],
+   "series": {
+    "primary": {
+     "label": "ATD",
+     "ret": [
+      7.6,
+      -0.5,
+      11.0,
+      4.8,
+      16.1,
+      -9.8,
+      7.2,
+      6.0,
+      -0.8,
+      4.8
+     ],
+     "maxdd": [
+      2.4,
+      7.9,
+      3.2,
+      16.0,
+      3.3,
+      10.2,
+      5.6,
+      4.2,
+      9.0,
+      3.1
+     ],
+     "sharpe": [
+      2.18,
+      -0.04,
+      1.92,
+      0.5,
+      1.82,
+      -1.48,
+      1.24,
+      0.92,
+      -0.11,
+      1.83
+     ]
+    },
+    "B2_ema200": {
+     "label": "EMA-200",
+     "ret": [
+      11.9,
+      -1.4,
+      16.1,
+      18.2,
+      21.3,
+      -10.7,
+      8.3,
+      10.7,
+      1.8,
+      11.3
+     ],
+     "maxdd": [
+      2.8,
+      10.9,
+      3.7,
+      15.1,
+      7.9,
+      11.2,
+      6.8,
+      6.9,
+      10.6,
+      6.0
+     ],
+     "sharpe": [
+      2.11,
+      -0.09,
+      2.03,
+      1.25,
+      1.34,
+      -1.29,
+      1.04,
+      1.02,
+      0.25,
+      1.88
+     ]
+    },
+    "B1_buyhold": {
+     "label": "Buy & hold",
+     "ret": [
+      17.0,
+      -4.9,
+      31.0,
+      38.5,
+      26.9,
+      -15.0,
+      17.7,
+      12.2,
+      11.4,
+      16.6
+     ],
+     "maxdd": [
+      3.9,
+      20.9,
+      6.2,
+      35.9,
+      9.4,
+      24.4,
+      13.5,
+      8.9,
+      19.3,
+      9.6
+     ],
+     "sharpe": [
+      2.3,
+      -0.23,
+      2.14,
+      1.13,
+      1.45,
+      -0.47,
+      1.17,
+      0.86,
+      0.68,
+      1.91
+     ]
+    }
+   },
+   "summary": {
+    "primary": {
+     "sharpe": 0.698,
+     "cagr": 4.8,
+     "maxdd": 16.0
+    },
+    "B2_ema200": {
+     "sharpe": 0.8693,
+     "cagr": 8.9,
+     "maxdd": 16.7
+    },
+    "B1_buyhold": {
+     "sharpe": 0.819,
+     "cagr": 15.2,
+     "maxdd": 35.9
+    }
+   },
+   "delta_vs_ctrl": {
+    "delta": -0.1712,
+    "lo": -0.4623,
+    "hi": 0.1421,
+    "p_gt0": 0.142
+   }
+  }
+ ]
+};
+const AB = {"books":[{"key":"primary","label":"ATD","pts":[{"u":"Faith-11","alpha":-3.9,"beta":0.446,"p":0.129},{"u":"ADV-315","alpha":-2.0,"beta":0.404,"p":0.106},{"u":"Mid-502","alpha":-1.74,"beta":0.301,"p":0.08},{"u":"Midcap-817","alpha":-1.88,"beta":0.344,"p":0.069}]},{"key":"B2_ema200","label":"EMA-200","pts":[{"u":"Faith-11","alpha":1.02,"beta":0.579,"p":0.818},{"u":"ADV-315","alpha":1.09,"beta":0.503,"p":0.597},{"u":"Mid-502","alpha":1.9,"beta":0.343,"p":0.284},{"u":"Midcap-817","alpha":1.48,"beta":0.412,"p":0.39}]},{"key":"B1_buyhold","label":"Buy & hold","pts":[{"u":"Faith-11","alpha":3.83,"beta":1.248,"p":0.533},{"u":"ADV-315","alpha":1.3,"beta":1.039,"p":0.561},{"u":"Mid-502","alpha":2.39,"beta":0.85,"p":0.195},{"u":"Midcap-817","alpha":1.77,"beta":0.935,"p":0.308}]}]};
+const AB_CLS = {primary:"atd", B2_ema200:"ema", B1_buyhold:"bh"};
+const METRICS = {
+  ret:   {label:"Return %", hint:"Calendar-year total return. Higher is better.", sym:true, unit:"%"},
+  maxdd: {label:"Max drawdown %", hint:"Deepest peak-to-trough within the year. Lower is better.", sym:false, unit:"%"},
+  sharpe:{label:"Sharpe", hint:"Within-year annualized Sharpe. Higher is better.", sym:true, unit:""},
+};
+const SER = [["primary","atd"],["B2_ema200","ema"],["B1_buyhold","bh"]];
+let metric = "ret";
+
+const W=560,H=300,M={t:14,r:12,b:26,l:34};
+const PW=W-M.l-M.r, PH=H-M.t-M.b;
+const yr2 = y => "’"+y.slice(2);
+const fmt = (v,u)=>{
+  if(v==null) return "—";
+  const sign = METRICS[metric].sym && v>0 ? "+" : "";
+  return u==="%" ? sign+v.toFixed(1)+"%" : sign+v.toFixed(2);
+};
+
+function domain(u){
+  let vals=[];
+  for(const [k] of SER) vals.push(...u.series[k][metric].filter(v=>v!=null));
+  let max=Math.max(...vals,0), min=Math.min(...vals,0);
+  if(METRICS[metric].sym){ const m=Math.max(Math.abs(max),Math.abs(min))*1.08||1; return [-m,m]; }
+  return [0, (max*1.08)||1];
+}
+function ticks(lo,hi){
+  const span=hi-lo, raw=span/4, mag=Math.pow(10,Math.floor(Math.log10(raw)));
+  const step=[1,2,2.5,5,10].map(s=>s*mag).find(s=>s>=raw)||mag;
+  const out=[]; for(let t=Math.ceil(lo/step)*step;t<=hi+1e-9;t+=step) out.push(+t.toFixed(6)); return out;
+}
+
+function chartSVG(u){
+  const [lo,hi]=domain(u);
+  const y=v=>M.t+PH-(v-lo)/(hi-lo)*PH;
+  const years=u.years, gW=PW/years.length, inner=gW*0.62, bw=inner/3;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${u.label} per-year ${METRICS[metric].label}">`;
+  for(const t of ticks(lo,hi)){
+    const yy=y(t).toFixed(1);
+    s+=`<line class="${Math.abs(t)<1e-9?'zeroline':'gridline'}" x1="${M.l}" y1="${yy}" x2="${W-M.r}" y2="${yy}"/>`;
+    s+=`<text class="axislbl y" x="${M.l-6}" y="${(+yy+3).toFixed(1)}">${metric==='sharpe'?t.toFixed(1):Math.round(t)}</text>`;
+  }
+  years.forEach((yr,i)=>{
+    const gx=M.l+i*gW+gW/2;
+    s+=`<text class="axislbl x" x="${gx.toFixed(1)}" y="${H-9}">${yr2(yr)}</text>`;
+    SER.forEach(([k,cls],j)=>{
+      const v=u.series[k][metric][i]; if(v==null) return;
+      const bx=gx-inner/2+j*bw;
+      const y0=y(0), yv=y(v), top=Math.min(y0,yv), h=Math.max(1.4,Math.abs(yv-y0));
+      const meta=`${u.key}|${i}|${k}`;
+      s+=`<rect class="bar ${cls}" x="${(bx+0.6).toFixed(1)}" y="${top.toFixed(1)}" width="${(bw-1.2).toFixed(1)}" height="${h.toFixed(1)}" rx="2"/>`;
+      s+=`<rect class="hit" data-m="${meta}" x="${bx.toFixed(1)}" y="${M.t}" width="${bw.toFixed(1)}" height="${PH}"/>`;
+    });
+  });
+  return s+`</svg>`;
+}
+
+function tableHTML(u){
+  let h=`<div class="tbl-wrap"><table><thead><tr><th>Year</th>`;
+  h+=SER.map(([,c],i)=>`<th class="${c}">${u.series[SER[i][0]].label}</th>`).join("");
+  h+=`</tr></thead><tbody>`;
+  u.years.forEach((yr,i)=>{
+    h+=`<tr><td>${yr}${(yr==='2017'||yr==='2026')?'*':''}</td>`;
+    h+=SER.map(([k,c])=>`<td class="${c}">${fmt(u.series[k][metric][i],METRICS[metric].unit)}</td>`).join("");
+    h+=`</tr>`;
+  });
+  h+=`</tbody></table></div>`;
+  return h;
+}
+
+function panelHTML(u){
+  const dv=u.delta_vs_ctrl;
+  const stat=(k,c)=>{const S=u.summary[k];return `<span class="k"><i class="dot ${c}"></i><b>${S.sharpe.toFixed(2)}</b></span>`;};
+  return `<figure>
+    <div class="p-head">
+      <div class="p-title">${u.label}</div>
+      <div class="p-chip">ΔSharpe vs control ${dv.delta>0?'+':''}${dv.delta.toFixed(2)} · p(better) ${dv.p_gt0.toFixed(2)}</div>
+    </div>
+    <div class="stats" aria-label="full-period Sharpe">
+      Full-period Sharpe → ${stat('primary','atd')} ${stat('B2_ema200','ema')} ${stat('B1_buyhold','bh')}
+      &nbsp;·&nbsp; CAGR ${u.summary.primary.cagr}% / ${u.summary.B2_ema200.cagr}% / ${u.summary.B1_buyhold.cagr}%
+    </div>
+    <div class="chart" id="c-${u.key}">${chartSVG(u)}</div>
+    <button class="tbtn" data-t="${u.key}" aria-expanded="false">Show table</button>
+    <div class="tbl" id="t-${u.key}" hidden>${tableHTML(u)}</div>
+  </figure>`;
+}
+
+function render(){
+  document.getElementById("grid").innerHTML = DATA.universes.map(panelHTML).join("");
+  document.getElementById("hint").textContent = METRICS[metric].hint;
+  wire();
+}
+function toggleTable(b){
+  const el=document.getElementById("t-"+b.dataset.t), open=!el.hidden;
+  el.hidden=open; b.setAttribute("aria-expanded",String(!open)); b.textContent=open?"Show table":"Hide table";
+}
+function wire(){
+  document.querySelectorAll("#grid .hit").forEach(h=>{
+    h.addEventListener("mousemove",showTip); h.addEventListener("mouseleave",hideTip);
+  });
+  document.querySelectorAll("#grid .tbtn").forEach(b=>b.addEventListener("click",()=>toggleTable(b)));
+}
+
+function renderAB(){
+  const W=720,H=340,m={t:16,r:16,b:36,l:48},pw=W-m.l-m.r,ph=H-m.t-m.b,bmax=1.35;
+  const aall=AB.books.flatMap(b=>b.pts.map(p=>p.alpha));
+  const am=Math.max(5,Math.ceil(Math.max(...aall.map(Math.abs))));
+  const x=b=>m.l+(b/bmax)*pw, y=a=>m.t+ph-((a+am)/(2*am))*ph;
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Alpha versus beta, per book per universe">`;
+  const ystep=am<=6?1:2;
+  for(let t=-am;t<=am+1e-9;t+=ystep){const yy=y(t).toFixed(1);
+    s+=`<line class="${Math.abs(t)<1e-9?'zeroline':'gridline'}" x1="${m.l}" y1="${yy}" x2="${W-m.r}" y2="${yy}"/>`;
+    s+=`<text class="axislbl y" x="${m.l-6}" y="${(+yy+3).toFixed(1)}">${t>0?'+':''}${t}%</text>`;}
+  for(let b=0;b<=bmax+1e-9;b+=0.25){const xx=x(b).toFixed(1);
+    s+=`<line class="gridline" x1="${xx}" y1="${m.t}" x2="${xx}" y2="${(m.t+ph).toFixed(1)}"/>`;
+    s+=`<text class="axislbl x" x="${xx}" y="${H-13}">${b.toFixed(2)}</text>`;}
+  s+=`<text class="axttl" x="${(m.l+pw/2).toFixed(0)}" y="${H-1}">Market beta (Dimson)</text>`;
+  s+=`<text class="axttl" transform="rotate(-90 13 ${(m.t+ph/2).toFixed(0)})" x="13" y="${(m.t+ph/2).toFixed(0)}">Alpha, %/yr</text>`;
+  AB.books.forEach(bk=>bk.pts.forEach((p,i)=>{
+    const cx=x(p.beta).toFixed(1),cy=y(p.alpha).toFixed(1);
+    s+=`<circle class="pt ${AB_CLS[bk.key]}" cx="${cx}" cy="${cy}" r="6"/>`;
+    s+=`<circle class="hitc" data-ab="${bk.key}|${i}" cx="${cx}" cy="${cy}" r="12"/>`;
+  }));
+  document.getElementById("ab-chart").innerHTML=s+`</svg>`;
+  let th=`<div class="tbl-wrap"><table><thead><tr><th>Book</th><th>Universe</th><th>Alpha %/yr</th><th>Beta</th><th>p (HAC)</th></tr></thead><tbody>`;
+  AB.books.forEach(bk=>bk.pts.forEach(p=>{th+=`<tr><td class="${AB_CLS[bk.key]}">${bk.label}</td><td style="text-align:left">${p.u}</td><td>${p.alpha>0?'+':''}${p.alpha.toFixed(1)}%</td><td>${p.beta.toFixed(2)}</td><td>${p.p.toFixed(2)}</td></tr>`;}));
+  document.getElementById("t-ab").innerHTML=th+`</tbody></table></div>`;
+  document.querySelectorAll("#ab-chart .hitc").forEach(h=>{h.addEventListener("mousemove",showTipAB);h.addEventListener("mouseleave",hideTip);});
+  document.querySelector('.tbtn[data-t="ab"]').addEventListener("click",function(){toggleTable(this);});
+}
+function showTipAB(e){
+  const [k,i]=e.target.dataset.ab.split("|"); const bk=AB.books.find(b=>b.key===k); const p=bk.pts[+i];
+  tip.innerHTML=`<div class="ty">${bk.label} · ${p.u}</div>`+
+    `<div class="tr"><span style="color:var(--s-${AB_CLS[k]})">Alpha</span><b>${p.alpha>0?'+':''}${p.alpha.toFixed(1)}%/yr</b></div>`+
+    `<div class="tr"><span>Beta</span><b>${p.beta.toFixed(2)}</b></div>`+
+    `<div class="tr"><span>p (HAC)</span><b>${p.p.toFixed(2)}</b></div>`;
+  tip.style.opacity="1"; const pad=14; let x=e.clientX+pad,yv=e.clientY+pad; const r=tip.getBoundingClientRect();
+  if(x+r.width>innerWidth)x=e.clientX-r.width-pad; if(yv+r.height>innerHeight)yv=e.clientY-r.height-pad;
+  tip.style.left=x+"px"; tip.style.top=yv+"px";
+}
+const tip=document.getElementById("tip");
+function showTip(e){
+  const [uk, i,sel]=e.target.dataset.m.split("|");
+  const u=DATA.universes.find(x=>x.key===uk); const idx=+i;
+  const rows=SER.map(([k,c])=>{
+    const v=u.series[k][metric][idx];
+    return `<div class="tr"><span style="color:var(--s-${c})">${u.series[k].label}</span><b>${fmt(v,METRICS[metric].unit)}</b></div>`;
+  }).join("");
+  tip.innerHTML=`<div class="ty">${u.label} · ${u.years[idx]}${(u.years[idx]==='2017'||u.years[idx]==='2026')?' (partial)':''} · ${METRICS[metric].label}</div>${rows}`;
+  tip.style.opacity="1";
+  const pad=14; let x=e.clientX+pad, yv=e.clientY+pad;
+  const r=tip.getBoundingClientRect();
+  if(x+r.width>innerWidth) x=e.clientX-r.width-pad;
+  if(yv+r.height>innerHeight) yv=e.clientY-r.height-pad;
+  tip.style.left=x+"px"; tip.style.top=yv+"px";
+}
+function hideTip(){tip.style.opacity="0";}
+
+document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",()=>{
+  metric=b.dataset.metric;
+  document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+  render();
+}));
+render();
+renderAB();
+</script>
