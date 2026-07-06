@@ -1,0 +1,21 @@
+Really like how you built this — the deterministic "scripts do the math, the human approves" design is the right call, and the indicator implementations are actually correct (proper Wilder RSI, SMA-seeded EMAs, population-σ Bollinger). That's rarer than it should be.
+
+I was curious whether the decision cascade adds a real edge, so I ran a pre-registered backtest of your three scripts (vendored byte-for-byte) over ~9.4 years of daily bars — realistic next-open fills, costs, and dividends — and tested it against three controls run through the *identical* engine: a plain 200-day EMA in/out filter, buy-and-hold, and random trading matched to its own turnover.
+
+Honest result: **no timing edge.** On your own ticker set the Sharpe comes out ATD **0.35** vs the EMA-200 filter **0.61** vs buy-and-hold **0.70** — and vs random-at-same-turnover **0.58**. It lands last of the four in all four universes I tested, at every cost tier, and even *gross* (0 bps). Factor-neutral alpha is slightly negative. It does cut drawdowns — but the trivial EMA-200 filter cuts them just as much with a higher return, so the "safety" isn't unique; it's mostly just being ~50% in cash.
+
+The mechanism: "exit on exhaustion" sells strength that tends to keep going. TSLA rose ~24× over the window; the system's timing on TSLA *lost* 32%.
+
+**What would have to change (the constructive part):**
+
+- **Stop fading trends.** The "exit on exhaustion" logic sells strength that tends to continue — it's why the system loses to random. Keep the EMA-structure / death-cross skeleton, drop the RSI/MACD/TRIX exhaustion exits and oversold-rebound entries, hold winners, and decide weekly not daily. This gets you *up to* the EMA-200 filter — but that filter has no real alpha either, so it's necessary, not sufficient.
+- **Add cross-sectional selection.** Right now each ticker is timed in isolation, so the system can't tell a good name from a bad one. Rank the universe by relative strength and hold only the top-K, rebalancing — that adds information a price filter structurally lacks, and it's the one change most likely to actually beat the control.
+- **Longer-shot levers:** a genuine non-price signal (fundamentals / flow — daily EMA/RSI/MACD is fully arbitraged), conviction-based sizing, and making the macro pillar actually gate exposure instead of being decorative.
+- Honest caveat: even that may not clear a strict bar — cross-sectional daily momentum is crowded. But it's the only direction with a real shot.
+
+I kept this comment to the highlights — **the full results and findings are in the repo:** the complete per-year and per-universe breakdowns, the alpha-vs-beta plane, an interactive chart (Return / drawdown / Sharpe across all 4 universes), the exact method, my initial read before running, and the raw trade ledger.
+
+- Full write-up: https://github.com/druthulu/algo-trading-reviews/tree/main/agentic-trading-desk
+- Interactive chart: https://druthulu.github.io/algo-trading-reviews/agentic-trading-desk/per-year-chart.html
+
+Not trying to dunk — the code is clean. Happy to answer questions or share the ledger for any specific name.
