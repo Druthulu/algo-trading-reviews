@@ -17,3 +17,14 @@ What I found:
 Bottom line: it does exactly what it says, and it's fine as a small cash-parked mean-reversion harvester in a kind regime — but the win rate and profit factor are the averaging mechanic plus a lucky window, not a timing edge, and the risk is a rare uncompensated drawdown that just didn't show up in-sample. What would change my mind: the single-order version turning clearly profitable (a real entry signal), or beating random-timing with a CI above zero. Neither holds here.
 
 Happy to share the harness details / full tables if useful.
+
+Here is a chart covering the details:
+https://druthulu.github.io/algo-trading-reviews/gram-rsi-3commas/chart.html
+
+Initial thoughts:
+https://druthulu.github.io/algo-trading-reviews/gram-rsi-3commas/initial-thoughts.md
+
+
+full review:
+https://druthulu.github.io/algo-trading-reviews/gram-rsi-3commas/review.md
+
