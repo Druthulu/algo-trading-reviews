@@ -1,0 +1,222 @@
+<title>GRAM RSI [3Commas] — independent review</title>
+<style>
+:root{
+  --plane:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+  --grid:#e1e0d9; --base:#c3c2b7; --hair:rgba(11,11,11,0.10);
+  --full:#2a78d6; --ladder:#1baf7a; --gate:#c98a1b; --bh:#eb6834;
+  --bad:#c0392b; --bad-bg:rgba(192,57,43,0.10);
+  --mono:ui-monospace,"Cascadia Code","SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root{
+  --plane:#0d0d0d; --surface:#1a1a19; --ink:#fff; --ink2:#c3c2b7; --muted:#898781;
+  --grid:#2c2c2a; --base:#383835; --hair:rgba(255,255,255,0.10);
+  --full:#3987e5; --ladder:#199e70; --gate:#d99a2b; --bh:#d95926;
+  --bad:#e57368; --bad-bg:rgba(229,115,104,0.13);}}
+:root[data-theme="light"]{--plane:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;--grid:#e1e0d9;--base:#c3c2b7;--hair:rgba(11,11,11,0.10);--full:#2a78d6;--ladder:#1baf7a;--gate:#c98a1b;--bh:#eb6834;--bad:#c0392b;--bad-bg:rgba(192,57,43,0.10);}
+:root[data-theme="dark"]{--plane:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--base:#383835;--hair:rgba(255,255,255,0.10);--full:#3987e5;--ladder:#199e70;--gate:#d99a2b;--bh:#d95926;--bad:#e57368;--bad-bg:rgba(229,115,104,0.13);}
+*{box-sizing:border-box}
+body{margin:0;background:var(--plane);color:var(--ink);font-family:var(--sans);line-height:1.5;-webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums}
+.wrap{max-width:1120px;margin:0 auto;padding:clamp(20px,4vw,44px)}
+.eyebrow{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+h1{font-size:clamp(1.5rem,3.4vw,2.15rem);line-height:1.12;margin:0 0 14px;font-weight:650;letter-spacing:-.01em;max-width:26ch}
+.lede{font-size:1.02rem;color:var(--ink2);max-width:66ch;margin:0 0 18px}
+.lede b{color:var(--ink);font-weight:600}
+.verdict{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--bad);background:var(--bad-bg);border:1px solid color-mix(in srgb,var(--bad) 40%,transparent);padding:5px 11px;border-radius:999px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 20px;font-family:var(--mono);font-size:.73rem;color:var(--muted);border-top:1px solid var(--hair);padding-top:14px;margin-top:16px}
+.meta b{color:var(--ink2);font-weight:600}
+section{margin-top:30px}
+h2{font-size:1.15rem;font-weight:640;margin:0 0 4px;letter-spacing:-.01em}
+.sub{font-size:.94rem;color:var(--ink2);margin:0 0 14px;max-width:74ch}
+.sub b{color:var(--ink)}
+figure{margin:0;background:var(--surface);border:1px solid var(--hair);border-radius:14px;padding:16px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:.72rem;color:var(--ink2);margin:2px 0 12px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+.sw.full{background:var(--full)}.sw.gate{background:var(--gate)}.sw.ladder{background:var(--ladder)}.sw.bh{background:var(--bh)}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--hair);border-radius:12px;padding:14px 16px}
+.stat .k{font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-size:1.5rem;font-weight:650;margin-top:4px}
+.stat .n{font-size:.8rem;color:var(--ink2);margin-top:2px}
+.chart svg{width:100%;height:auto;display:block}
+.gridline{stroke:var(--grid);stroke-width:1}.zeroline{stroke:var(--base);stroke-width:1.5}
+.axislbl{fill:var(--muted);font-family:var(--mono);font-size:10px}
+.axttl{fill:var(--muted);font-family:var(--mono);font-size:10px;text-anchor:middle}
+.blbl{fill:var(--ink2);font-family:var(--mono);font-size:10px}
+.pt{stroke:var(--surface);stroke-width:1.5}.pt.full{fill:var(--full)}.pt.ladder{fill:var(--ladder)}.pt.bh{fill:var(--bh)}
+.ptlbl{fill:var(--ink2);font-family:var(--mono);font-size:10px}
+footer{margin-top:34px;border-top:1px solid var(--hair);padding-top:16px;color:var(--ink2);font-size:.86rem;max-width:74ch}
+footer .fnote{font-family:var(--mono);font-size:.71rem;color:var(--muted);margin-top:8px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Independent backtest · feasibility audit</p>
+  <h1>GRAM RSI [3Commas]: the win rate is real, the edge isn't</h1>
+  <p class="lede"><span class="verdict">● No edge</span>&nbsp; A faithful, pre-registered
+  reimplementation over 13 major coins (2024–25, marked-to-market). The deep-oversold RSI
+  entry makes <b>nothing on its own</b>; all "profit" is the averaging mechanic; and the
+  account is <b>~99.9% idle cash</b>, so the tiny drawdown and high Sharpe are a
+  near-zero-deployment illusion — not skill.</p>
+  <div class="meta">
+    <span><b>Assets</b> 13 majors, 4h</span><span><b>Window</b> 2024-01 → 2025-12</span>
+    <span><b>Cost</b> 6 bps/side</span><span><b>Curves</b> mark-to-market (open positions incl.)</span>
+    <span><b>Basis</b> pre-registered</span>
+  </div>
+
+  <section>
+    <h2>1 · Which mechanic pays?</h2>
+    <p class="sub">Net return per coin, splitting the strategy into its parts. <b>The RSI entry
+    alone (amber) is flat everywhere</b>; the averaging ladder with <i>no</i> RSI gate (green) is
+    the entire engine; the shipped combo (blue) sits in between — the gate mostly just trades less.</p>
+    <div class="legend">
+      <span><i class="sw full"></i>S_full (RSI + ladder)</span>
+      <span><i class="sw gate"></i>entry signal alone</span>
+      <span><i class="sw ladder"></i>averaging alone (no RSI)</span>
+    </div>
+    <figure><div class="chart" id="c-decomp"></div></figure>
+  </section>
+
+  <section>
+    <h2>2 · The 99.9%-cash illusion</h2>
+    <p class="sub">Pooled across the majors. A high Sharpe on an account that is almost always in
+    cash says nothing about trade quality — and "beating" a −44%-median buy-and-hold is just
+    <b>not being in the market</b>.</p>
+    <div class="strip" id="strip"></div>
+  </section>
+
+  <section>
+    <h2>3 · Alpha vs. BTC-beta (market-neutral test)</h2>
+    <p class="sub">Whole-period regression on BTC (Newey-West). S_full's <b>+1.3%/yr at zero beta</b>
+    is real in-sample — but it's <b>smaller than the no-gate ladder's</b>, so the RSI gate subtracts
+    alpha; and it's the fee for writing naked crash-insurance, which one tail event erases.</p>
+    <figure><div class="chart" id="c-ab"></div></figure>
+  </section>
+
+  <section>
+    <h2>4 · The drawdown is small only because the tail never fired</h2>
+    <p class="sub">The reported 2.21% is a <i>closed-trade</i> number. In-sample <b>zero trades closed
+    at a loss</b> across 13 coins (several down 70–90%) — the ladder always escaped on a bounce. Feed
+    it a smooth −56% decline with no bounce and the trade loses <b>46%</b>.</p>
+    <figure><div class="chart" id="c-dd"></div></figure>
+  </section>
+
+  <section>
+    <h2>5 · On stocks (2016–2026): same illusion — and here the tail bites</h2>
+    <p class="sub">The identical 4h mechanic on equities, full history (incl. 2020 &amp; 2022). S_full
+    (blue) earned low-single-digits over a <b>decade</b> while buy-and-hold (orange, log axis) did
+    hundreds to tens-of-thousands of percent — and the always-in averaging ladder took a
+    <b>forced loss on every name</b>, 31–58% underwater.</p>
+    <figure><div class="chart" id="c-stocks"></div></figure>
+  </section>
+
+  <footer>
+    Faithful reimplementation from the published spec (Wilder RSI(14) on 4h closes; 5-rung limit
+    ladder; TP off the blended VWAP; no stop), driven through one mark-to-market engine with a
+    cash-conservation invariant and a hand-checked ladder trade. Controls: entry-only, averaging-only,
+    random-turnover-matched, buy-and-hold, BTC. Pre-registered before running.
+    <div class="fnote">Primary metric = paired block-bootstrap ΔSharpe of S_full − random-timing:
+    +0.63 [-0.16, +1.65] — includes zero, i.e. no timing skill. Independent test on offline Kraken 4h data;
+    not a reproduction of the author's exact venue/window.</div>
+  </footer>
+</div>
+<div class="tip" id="tip"></div>
+
+
+<script>
+const D = {"decomp": [{"sym": "JUP", "full": 3.926, "gate": -0.001, "ladder": 34.754, "bh": -73.13}, {"sym": "LINK", "full": 3.965, "gate": 0.431, "ladder": 31.018, "bh": -18.614}, {"sym": "XRP", "full": 4.344, "gate": 0.102, "ladder": 30.571, "bh": 198.869}, {"sym": "ADA", "full": 3.755, "gate": 0.25, "ladder": 25.424, "bh": -43.999}, {"sym": "LTC", "full": 2.944, "gate": 0.331, "ladder": 23.031, "bh": 5.335}, {"sym": "DOT", "full": 4.543, "gate": 0.362, "ladder": 18.631, "bh": -78.211}, {"sym": "ETH", "full": 4.84, "gate": 0.215, "ladder": 18.427, "bh": 29.949}, {"sym": "SOL", "full": 3.398, "gate": 0.431, "ladder": 15.889, "bh": 22.229}, {"sym": "POL", "full": 3.198, "gate": -0.24, "ladder": 10.207, "bh": -89.976}, {"sym": "BTC", "full": 1.577, "gate": 0.174, "ladder": 9.478, "bh": 107.02}, {"sym": "AVAX", "full": 4.643, "gate": -0.124, "ladder": -0.361, "bh": -68.121}, {"sym": "TON", "full": 2.921, "gate": -0.204, "ladder": -10.44, "bh": -68.463}, {"sym": "ATOM", "full": 4.846, "gate": -0.402, "ladder": -13.256, "bh": -81.844}], "ab": [{"k": "full", "label": "S_full (RSI+ladder)", "alpha": 1.28, "beta": -0.0, "t": 4.33}, {"k": "ladder", "label": "averaging only", "alpha": 2.67, "beta": 0.069, "t": 1.9}, {"k": "bh", "label": "buy & hold", "alpha": -26.38, "beta": 1.138, "t": -1.5}], "dd": [{"label": "reported (closed-trade)", "val": 2.21, "cls": "muted"}, {"label": "my closed-trade DD", "val": 0.0, "cls": "muted"}, {"label": "account MTM DD (open incl.)", "val": 1.14, "cls": "full"}, {"label": "worst live position underwater", "val": 10.07, "cls": "ladder"}, {"label": "synthetic monotonic \u221256% crash", "val": 45.82, "cls": "bad"}], "stocks": [{"sym": "SPY", "full": 2.781, "bh": 266.58, "forced": 1, "uw": 20.06}, {"sym": "QQQ", "full": 3.29, "bh": 560.75, "forced": 1, "uw": 15.3}, {"sym": "AAPL", "full": 4.022, "bh": 1029.4, "forced": 1, "uw": 17.48}, {"sym": "NVDA", "full": 5.895, "bh": 25806.67, "forced": 1, "uw": 51.26}, {"sym": "TSLA", "full": 9.005, "bh": 2397.31, "forced": 1, "uw": 58.46}], "strip": {"deploy": 0.126, "inmkt": 5.84, "sharpe": 1.932, "net": 3.762, "gate": 0.102, "ladder": 14.875}, "primary": {"delta": 0.629168931489323, "lo": -0.1578066059053338, "hi": 1.6538422297985564}};
+const NS="http://www.w3.org/2000/svg";
+function el(t,a){const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);return e;}
+
+// ---- grouped horizontal bars: decomposition
+(function(){
+  const rows=D.decomp, keys=[["full","full"],["gate","gate"],["ladder","ladder"]];
+  const W=760, rowH=34, top=8, left=54, right=44, H=top+rows.length*rowH+24;
+  const vals=rows.flatMap(r=>[r.full,r.gate,r.ladder]); let mx=Math.max(...vals,5);
+  const x=v=>left+(v/mx)*(W-left-right);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});
+  for(let t=0;t<=mx+0.001;t+=Math.ceil(mx/5)){const xx=x(t);
+    svg.appendChild(el("line",{class:"gridline",x1:xx,y1:top,x2:xx,y2:top+rows.length*rowH}));
+    const tx=el("text",{class:"axislbl",x:xx,y:H-8,"text-anchor":"middle"});tx.textContent=t+"%";svg.appendChild(tx);}
+  rows.forEach((r,i)=>{
+    const y0=top+i*rowH;
+    const lab=el("text",{class:"blbl",x:left-8,y:y0+rowH/2+3,"text-anchor":"end"});lab.textContent=r.sym;svg.appendChild(lab);
+    keys.forEach((k,j)=>{
+      const v=r[k[0]], bh=(rowH-8)/3, yy=y0+2+j*bh;
+      const w=Math.max(0,x(v)-left);
+      svg.appendChild(el("rect",{x:left,y:yy,width:w,height:bh-1.5,rx:2,fill:`var(--${k[1]})`}));
+    });
+  });
+  document.getElementById("c-decomp").appendChild(svg);
+})();
+
+// ---- stat strip
+(function(){
+  const s=D.strip, host=document.getElementById("strip");
+  const cards=[
+    ["avg capital deployed", s.deploy.toFixed(2)+"%", "of the account"],
+    ["time in market", s.inmkt.toFixed(1)+"%", "of 4h bars"],
+    ["S_full net (pooled)", "+"+s.net.toFixed(2)+"%", "Sharpe "+s.sharpe.toFixed(2)+" — on 0.13% deployed"],
+    ["entry signal alone", "+"+s.gate.toFixed(2)+"%", "the RSI gate's standalone return"],
+    ["averaging alone", "+"+s.ladder.toFixed(1)+"%", "the actual engine"],
+  ];
+  cards.forEach(c=>{const d=document.createElement("div");d.className="stat";
+    d.innerHTML=`<div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="n">${c[2]}</div>`;host.appendChild(d);});
+})();
+
+// ---- alpha vs beta scatter
+(function(){
+  const pts=D.ab, W=720,H=320,m={t:16,r:20,b:38,l:52};
+  const pw=W-m.l-m.r, ph=H-m.t-m.b;
+  const bmin=-0.2,bmax=1.3; const amin=-30,amax=8;
+  const x=b=>m.l+(b-bmin)/(bmax-bmin)*pw, y=a=>m.t+ph-(a-amin)/(amax-amin)*ph;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});
+  for(let a=amin;a<=amax+0.1;a+=Math.ceil((amax-amin)/8)){const yy=y(a);
+    svg.appendChild(el("line",{class:Math.abs(a)<1e-9?"zeroline":"gridline",x1:m.l,y1:yy,x2:W-m.r,y2:yy}));
+    const tx=el("text",{class:"axislbl",x:m.l-6,y:yy+3,"text-anchor":"end"});tx.textContent=(a>0?"+":"")+a+"%";svg.appendChild(tx);}
+  for(let b=0;b<=bmax+0.01;b+=0.25){const xx=x(b);
+    svg.appendChild(el("line",{class:Math.abs(b)<1e-9?"zeroline":"gridline",x1:xx,y1:m.t,x2:xx,y2:m.t+ph}));
+    const tx=el("text",{class:"axislbl",x:xx,y:H-16,"text-anchor":"middle"});tx.textContent=b.toFixed(2);svg.appendChild(tx);}
+  const xt=el("text",{class:"axttl",x:m.l+pw/2,y:H-2});xt.textContent="BTC beta";svg.appendChild(xt);
+  const yt=el("text",{class:"axttl",transform:`rotate(-90 13 ${m.t+ph/2})`,x:13,y:m.t+ph/2});yt.textContent="Alpha, %/yr";svg.appendChild(yt);
+  pts.forEach(p=>{const cx=x(p.beta),cy=y(p.alpha);
+    svg.appendChild(el("circle",{class:"pt "+p.k,cx,cy,r:7}));
+    const t=el("text",{class:"ptlbl",x:cx+11,y:cy+3});t.textContent=`${p.label} (α ${p.alpha>0?"+":""}${p.alpha}%, t ${p.t})`;svg.appendChild(t);});
+  document.getElementById("c-ab").appendChild(svg);
+})();
+
+// ---- drawdown honesty bars
+(function(){
+  const rows=D.dd, W=760, rowH=40, top=6, left=210, right=40, H=top+rows.length*rowH+20;
+  const mx=Math.max(...rows.map(r=>r.val),5);
+  const x=v=>left+(v/mx)*(W-left-right);
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});
+  rows.forEach((r,i)=>{const y0=top+i*rowH;
+    const lab=el("text",{class:"blbl",x:left-8,y:y0+rowH/2+3,"text-anchor":"end"});lab.textContent=r.label;svg.appendChild(lab);
+    svg.appendChild(el("rect",{x:left,y:y0+6,width:Math.max(1,x(r.val)-left),height:rowH-18,rx:2,fill:`var(--${r.cls})`}));
+    const v=el("text",{class:"blbl",x:x(r.val)+6,y:y0+rowH/2+3});v.textContent=r.val.toFixed(2)+"%";svg.appendChild(v);});
+  document.getElementById("c-dd").appendChild(svg);
+})();
+
+// ---- stocks: S_full vs buyhold (log)
+(function(){
+  const rows=D.stocks, W=760, gW=W/rows.length, top=10, bot=52, H=280;
+  const ph=H-top-bot;
+  const allv=rows.flatMap(r=>[Math.max(r.full,0.01),Math.max(r.bh,0.01)]);
+  const lmin=Math.log10(1), lmax=Math.log10(Math.max(...allv)*1.3);
+  const y=v=>top+ph-(Math.log10(Math.max(v,1))-lmin)/(lmax-lmin)*ph;
+  const svg=el("svg",{viewBox:`0 0 ${W} ${H}`,role:"img"});
+  [1,10,100,1000,10000].forEach(t=>{if(Math.log10(t)>lmax)return;const yy=y(t);
+    svg.appendChild(el("line",{class:"gridline",x1:30,y1:yy,x2:W,y2:yy}));
+    const tx=el("text",{class:"axislbl",x:28,y:yy+3,"text-anchor":"end"});tx.textContent="+"+t+"%";svg.appendChild(tx);});
+  rows.forEach((r,i)=>{const cx=30+i*((W-30)/rows.length)+((W-30)/rows.length)/2, bw=Math.min(30,((W-30)/rows.length)*0.3);
+    svg.appendChild(el("rect",{x:cx-bw-2,y:y(r.bh),width:bw,height:top+ph-y(r.bh),rx:2,fill:"var(--bh)"}));
+    svg.appendChild(el("rect",{x:cx+2,y:y(Math.max(r.full,1)),width:bw,height:top+ph-y(Math.max(r.full,1)),rx:2,fill:"var(--full)"}));
+    const s=el("text",{class:"blbl",x:cx,y:H-34,"text-anchor":"middle"});s.textContent=r.sym;svg.appendChild(s);
+    const f=el("text",{class:"axislbl",x:cx,y:H-20,"text-anchor":"middle"});f.textContent=`full +${r.full.toFixed(1)}%`;svg.appendChild(f);
+    const b=el("text",{class:"axislbl",x:cx,y:H-8,"text-anchor":"middle"});b.textContent=`B&H +${Math.round(r.bh)}%`;svg.appendChild(b);});
+  const lg=el("text",{class:"blbl",x:34,y:H-8});lg.textContent="■ buy&hold  ■ S_full (log axis)";svg.appendChild(lg);
+  document.getElementById("c-stocks").appendChild(svg);
+})();
+</script>

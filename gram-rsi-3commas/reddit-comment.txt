@@ -1,0 +1,19 @@
+Nice write-up — and genuine credit for the honesty: you flag the sub-100-trade sample, call it a martingale, and note the profit factor is partly the averaging mechanic rather than a directional edge. That candor is rare. I ran an independent, pre-registered backtest to put numbers on exactly those caveats. (Not financial advice; this is a feasibility audit of an open-source strategy.)
+
+Setup: I reimplemented the strategy faithfully from the spec (Wilder RSI(14) on 4h closes = TradingView's ta.rsi; the 5 safety orders as resting limit orders at the fixed −2/−5/−9.5/−16/−25% prices; TP recomputed off the blended VWAP after each fill; no stop) and drove it through one engine that marks OPEN positions to market every bar. Data: offline 4h bars for 13 major coins, Jan 2024–Dec 2025. Heads-up that "GRAM" is Toncoin (TON) rebranded, so the 4h history is Toncoin — which fell ~80% peak-to-trough inside the window. To test whether any of it is real, I split the strategy into its two parts and added the obvious controls.
+
+What I found:
+
+1. The RSI entry has no edge on its own. Buy RSI<28 with a SINGLE order and take +3% (no averaging): +0.10% pooled across the 13 coins. Strip out the ladder and the signal makes nothing. All the "profit" is the averaging mechanic — a no-gate averaging ladder (no RSI at all) actually makes ~4x more (+14.9%). So the deep-oversold timing isn't doing the work; the mean-reversion averaging is.
+
+2. Vs random entries at the same turnover, there's no timing skill. Paired block-bootstrap ΔSharpe of the strategy minus random-timing = +0.63 with a 90% CI of [−0.16, +1.65] — it includes zero. Random entries with the same ladder are statistically indistinguishable.
+
+3. The tiny drawdown is a ~99.9%-cash illusion. The account only ever deploys ~0.13% of capital on average (max ~8.5%, in the market ~6% of the time). An account that's almost always in cash has almost no volatility, so the Sharpe looks high and the drawdown looks tiny — that's not trade quality. It also "beats buy-and-hold" on the coins that crashed (median buy-and-hold −44%) only because it wasn't in the market; on the coins that ran (BTC +107%, XRP +199%) it captured almost none of it.
+
+4. The 2.21% max drawdown is a closed-trade number, and it's small only because the tail never fired. Across 13 coins — several down 70–90% — not one trade closed at a loss in-sample. The ladder fully loaded (all 5 AOs) 13 times and still escaped every time, because the declines were choppy enough to hand back a 3% bounce. Feed the same ladder a smooth −56% decline with no bounce and the trade loses ~46%. That's the martingale tail the no-stop design carries.
+
+5. It generalizes to stocks — as the same illusion, and there the tail bites. Same 4h mechanic on SPY/QQQ/AAPL/NVDA/TSLA over 2016–2026 (incl. 2020 and 2022): the strategy earned low-single-digit % over a DECADE while buy-and-hold did +266% to +25,807%, and the always-in averaging ladder took a forced loss on every name (31–58% underwater through the crashes).
+
+Bottom line: it does exactly what it says, and it's fine as a small cash-parked mean-reversion harvester in a kind regime — but the win rate and profit factor are the averaging mechanic plus a lucky window, not a timing edge, and the risk is a rare uncompensated drawdown that just didn't show up in-sample. What would change my mind: the single-order version turning clearly profitable (a real entry signal), or beating random-timing with a CI above zero. Neither holds here.
+
+Happy to share the harness details / full tables if useful.
